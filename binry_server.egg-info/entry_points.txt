@@ -1,3 +1,0 @@
-[console_scripts]
-binserver = app.binserver:run_server
-
