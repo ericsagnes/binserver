@@ -1,12 +1,7 @@
-with import <nixpkgs> {};
+{ pkgs ? import <nixpkgs> {} }:
+with pkgs;
 
-(python.buildEnv.override {
- extraLibs = with pythonPackages;
- [ 
-   # Used python2 packages
-   # python3 packages can be listed with 
-   # nix-env -f "<nixpkgs>" -qaP -A python2Packages
-   flask
-
- ];
-}).env
+let
+  python = pythonFull.withPackages (ps: [ps.flask]);
+in
+  python.env

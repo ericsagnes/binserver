@@ -1,8 +1,26 @@
-with import <nixpkgs> {};
+{ # Hydraのjobsetで定義できるように変数を指定
+  nixpkgs ? <nixpkgs>
+, systems ? ["i686-linux" "x86_64-linux" ]
+}:
 
-buildPythonPackage rec {
-  name = "binserver-${version}";
-  version = "1.0";
-  propagatedBuildInputs = with pkgs.pythonPackages; [ flask ];
-  srcs = ./.;
-}
+let
+
+  # vanilla nixpkgs
+  pkgs = import nixpkgs {};
+
+  # build.nixをインポートするヘルパー
+  buildFun = import ./build.nix;
+
+  jobs = {
+    # 各システムのパッケージを生成する
+    # -> { "i686-linux" = ...; "x86_64-linux" = ...; };
+    build = pkgs.lib.genAttrs systems (system:
+      buildFun {
+        # システムアーキテクチャ別のnixpkgs
+        pkgs = import nixpkgs { inherit system; };
+      }
+    );
+  };
+
+in
+  jobs

@@ -2,22 +2,30 @@
 
 NixOS/NixOps用のサンプルPythonサーバアプリケーション。
 
+
 ## ビルドする
 
 ```
-nix-build release.nix
+$ nix-build build.nix
 ```
+
 
 ## 実行する
 
 ```
-nix-shell --run "python app/binserver.py"
+$ nix-shell --run "python app/binserver.py"
 ```
+
+```
+$ curl  http://0.0.0.0:8080/123
+1111011
+```
+
 
 ## 開発環境に入る
 
 ```
-nix-shell
+$ nix-shell
 ```
 
 ## コンテナーで利用する
@@ -81,9 +89,9 @@ $ curl 10.0.0.2:8080/123
 
 ```
 {
-  network.description = "Web server";
+  network.description = "Binserver example";
 
-  webserver = { config, pkgs, ... }:
+  binserver = { config, pkgs, ... }:
     let
       binserverSrc = (import <nixpkgs> {}).fetchFromGitHub {
           owner  = "ericsagnes";
@@ -104,15 +112,12 @@ $ curl 10.0.0.2:8080/123
 
       services.nginx = {
         enable = true;
-        config = ''
-          events {}
-          http {
-            server {
-              listen 80;
-              location / {
-                proxy_pass          http://127.0.0.1:8080;
-                proxy_http_version  1.1;
-              }
+        httpConfig = ''
+          server {
+            listen 80;
+            location / {
+              proxy_pass          http://127.0.0.1:8080;
+              proxy_http_version  1.1;
             }
           }
         '';
